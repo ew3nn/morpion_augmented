@@ -1,4 +1,6 @@
 import random
+import torch
+from nn import mask
 
 def minimax(player, env, state=None):
     if state is None:
@@ -62,3 +64,15 @@ def boucle(epoch, env):
 
     print(f"Voici le score de fin de partie {score} cela fait {score[1]/epoch*100}% gagné par le joueur 1")
     return victoire
+
+def choose_action(state, epsilon, network, env):
+    prob = random.random()
+    if prob < epsilon :
+        action = choose_hasard(env)
+        return action
+    else :
+        state_tens = torch.tensor(state, dtype=torch.float32)
+        q_values = network(state_tens)
+        masked = mask(q_values, state)
+        action = torch.argmax(masked).item()
+        return action 
